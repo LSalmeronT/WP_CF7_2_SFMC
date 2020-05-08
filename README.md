@@ -1,2 +1,3 @@
-# WP_CF7_2_SFMC
-CF7 to SFMC Wordpress Plugin
+# Plugin Wordpress - CF7 to SFMC
+
+## Working ...
