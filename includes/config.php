@@ -15,9 +15,11 @@ function cf7_to_sfmc_config_menu()
 function register_cf7_to_sfmc_settings()
 {
     //register our settings
-    register_setting('cf7-to-sfmc', 'cf7tosfmc_client_key');
-    register_setting('cf7-to-sfmc', 'cf7tosfmc_client_secret');
-    register_setting('cf7-to-sfmc', 'cf7tosfmc_endpoint');
+    $group = 'cf7-to-sfmc';
+    register_setting($group, 'cf7tosfmc_client_key');
+    register_setting($group, 'cf7tosfmc_client_secret');
+    register_setting($group, 'cf7tosfmc_endpoint');
+    register_setting($group, 'cf7tosfmc_actual_token');
 }
 
 function cf7_to_sfmc_config_options()
@@ -27,8 +29,10 @@ function cf7_to_sfmc_config_options()
         <h1>Configuración CF7 to SFMC</h1>
 
         <form method="post" action="options.php">
+
             <?php settings_fields('cf7-to-sfmc'); ?>
             <?php do_settings_sections('cf7-to-sfmc'); ?>
+
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Client Key</th>

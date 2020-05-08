@@ -10,7 +10,8 @@ function sfmc_call_after_form_submit($contact_data)
     // Obtiene configuracion del plugin
     $client_key = get_option('cf7tosfmc_client_key');
     $client_secret = get_option('cf7tosfmc_client_secret');
-    $client_endpoint = get_option('cf7tosfmc_client_endpoint');
+    $endpoint = get_option('cf7tosfmc_endpoint');
+    $actualToken = get_option('cf7tosfmc_actual_token');
 
     // Obtiene array con datos del formulario
     $data = [
@@ -37,10 +38,22 @@ function sfmc_call_after_form_submit($contact_data)
     ];
 
     // Llamada a SFMC
+    // Si no hay token almacenado o ya no es valido, solicita uno nuevo
+    if(!$actualToken || false) { //Falta comprobar si es valido
 
-    // TODO
+        // Conecta para obtener token
+        $actualToken = '';
 
-    //wp_die($data);
+        // Actualiza option con nuevo token recibido
+        update_option( 'cf7tosfmc_actual_token', $actualToken );
+
+    } 
+
+    if($actualToken){
+        // Envia data
+    }
+
+    //wp_die(json_encode($contact_data));
 }
 
 /*
