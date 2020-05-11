@@ -1,3 +1,3 @@
-# Plugin Wordpress - CF7 to SFMC
+# Plugin Wordpress - CF7 to SF
 
 ## Working ...
