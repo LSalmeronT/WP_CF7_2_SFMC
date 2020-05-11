@@ -18,6 +18,7 @@ function register_cf7_to_sfmc_settings()
     $group = 'cf7-to-sfmc';
     register_setting($group, 'cf7tosfmc_client_key');
     register_setting($group, 'cf7tosfmc_client_secret');
+    register_setting($group, 'cf7tosfmc_auth_endpoint');
     register_setting($group, 'cf7tosfmc_endpoint');
     register_setting($group, 'cf7tosfmc_actual_token');
 }
@@ -42,6 +43,11 @@ function cf7_to_sfmc_config_options()
                 <tr valign="top">
                     <th scope="row">Client secret</th>
                     <td><input type="text" name="cf7tosfmc_client_secret" value="<?php echo esc_attr(get_option('cf7tosfmc_client_secret')); ?>" /></td>
+                </tr>
+
+                <tr valign="top">
+                    <th scope="row">Auth endpoint</th>
+                    <td><input type="text" name="cf7tosfmc_auth_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_auth_endpoint')); ?>" /></td>
                 </tr>
 
                 <tr valign="top">

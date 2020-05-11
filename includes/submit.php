@@ -4,15 +4,8 @@
 
 add_action('wpcf7_before_send_mail', 'sfmc_call_after_form_submit');
 
-function sfmc_call_after_form_submit($contact_data)
+function sfmc_call_after_form_submit()
 {
-
-    // Obtiene configuracion del plugin
-    $client_key = get_option('cf7tosfmc_client_key');
-    $client_secret = get_option('cf7tosfmc_client_secret');
-    $endpoint = get_option('cf7tosfmc_endpoint');
-    $actualToken = get_option('cf7tosfmc_actual_token');
-
     // Obtiene array con datos del formulario
     $data = [
         'FirstName' => separateNames($_POST['your-name'])['firstName'],
@@ -38,26 +31,66 @@ function sfmc_call_after_form_submit($contact_data)
     ];
 
     // Llamada a SFMC
-    // Si no hay token almacenado o ya no es valido, solicita uno nuevo
-    if(!$actualToken || false) { //Falta comprobar si es valido
 
-        // Conecta para obtener token
-        $actualToken = '';
+    $actualToken = get_option('cf7tosfmc_actual_token');
 
+    if (!$actualToken || !sfCheckToken()) {
+        // Conecta para obtener token nuevo
+        $actualToken = sfAuthenticate();
         // Actualiza option con nuevo token recibido
-        update_option( 'cf7tosfmc_actual_token', $actualToken );
-
-    } 
-
-    if($actualToken){
-        // Envia data
+        update_option('cf7tosfmc_actual_token', $actualToken);
     }
 
-    //wp_die(json_encode($contact_data));
+    if ($actualToken) {
+        sfSendData($data);
+    }
+}
+
+
+/*
+ * SF - Autenticación
+ */
+
+function sfAuthenticate()
+{
+
+    $client_key = get_option('cf7tosfmc_client_key');
+    $client_secret = get_option('cf7tosfmc_client_secret');
+    $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
+
+    $access_token = 'TO-DO';
+
+    return $access_token;
 }
 
 /*
- * Devuelve un valor entero en función aun String recibido de valores prestabecidos en el formulario
+ * SF - Chequea validez de token almacenado
+ */
+
+function sfCheckToken()
+{
+
+    $actualToken = get_option('cf7tosfmc_actual_token');
+    $endpoint = get_option('cf7tosfmc_endpoint');
+
+    return true;
+}
+
+/*
+ * SF - Envia datos de formulario
+ */
+
+function sfSendData()
+{
+
+    $actualToken = get_option('cf7tosfmc_actual_token');
+    $endpoint = get_option('cf7tosfmc_endpoint');
+
+    return true;
+}
+
+/*
+ * AUX - Devuelve un valor entero en función aun String recibido de valores prestabecidos en el formulario
  */
 
 function employeesInteger($employeesString)
@@ -83,7 +116,7 @@ function employeesInteger($employeesString)
 }
 
 /*
- * Separa nombre y apellidos
+ * AUX - Separa nombre y apellidos
  */
 
 function separateNames($full_name)
