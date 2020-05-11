@@ -9,9 +9,9 @@ function sfmc_call_after_form_submit()
     // Comprueba si se ha configurado el plugin
     if (checkOptions()) {
 
-        // Obtiene array con datos del formulario
+        // Genera array con datos del formulario
         $data = [
-            'FirstName' => separateNames($_POST['your-name'])['firstName'],
+            'FirstName' => separateNames($_POST['your-name'])['firstName'], 
             'LastName' => separateNames($_POST['your-name'])['lastName'],
             'Company' => $_POST['your-deal'],
             'Subtipo__c' => 'Pymes',
@@ -33,16 +33,18 @@ function sfmc_call_after_form_submit()
             'Producto_Interesado__c' => null,
         ];
 
-        // Llamada a SFMC
-
+        // Comprueba validez de token almacenado
         $currenToken = get_option('cf7tosfmc_token');
-        $currentTokenExpiration = get_option('cf7tosfmc_token_expires');
+        $currentTokenExpireTime = get_option('cf7tosfmc_token_expire_time');
+        $currentTokenIssuedDate = get_option('cf7tosfmc_token_issued_date');
 
-        if (!$currenToken || !sfCheckToken($currentTokenExpiration)) {
+        // Si no es valido, lo obtiene
+        if (!$currenToken || (time() >= $currentTokenIssuedDate + $currentTokenExpireTime )) {
             // Conecta para obtener token nuevo
             $currentToken = sfAuthenticate();
         }
 
+        // Envia información del formulario
         if ($currentToken) {
             sfSendData($data);
         }
@@ -63,8 +65,11 @@ function checkOptions()
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
     $user = get_option('cf7tosfmc_user');
     $pass = get_option('cf7tosfmc_pass');
+    $userSecurity = get_option('cf7tosfmc_user_security');
+    $tokenExpireTime = get_option('cf7tosfmc_token_expire_time');
 
-    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$user || !$pass) {
+    // Por el momento solo compruebo que ninguno esté vacio. 
+    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$user || !$pass || !$userSecurity || !$tokenExpireTime) {
         return false;
     }
     return true;
@@ -84,6 +89,7 @@ function sfAuthenticate()
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
     $username = get_option('cf7tosfmc_user');
     $pass = get_option('cf7tosfmc_pass');
+    $userSecurity = get_option('cf7tosfmc_user_security');
 
     try {
         $args = array(
@@ -92,39 +98,23 @@ function sfAuthenticate()
                 'client_id'   => $client_key,
                 'client_secret' => $client_secret,
                 'username' => $username,
-                'password' => $pass
+                'password' => $pass . $userSecurity
             )
         );
 
         $response = wp_remote_post($auth_endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
-        
+
         if ($http_code == 200) {
-            update_option('cf7tosfmc_token', 'TODO');
-            update_option('cf7tosfmc_token_expiration', time());
-
-            // TODO !!!
-            return 'TODO';
-            //
-
+            update_option('cf7tosfmc_token', 'TODO'); // TODO => Obtener 'access_token' de $response
+            update_option('cf7tosfmc_token_issued_date', time());
+            return 'TODO'; // TODO => Obtener 'access_token' de $response
         } else {
             return null;
         }
     } catch (\Exception $e) {
         return null;
     }
-}
-
-/*
- * SF - Chequea validez de token almacenado
- * 
- * @param String $expiration Timestamp
- * @return bool
- */
-
-function sfCheckToken($expiration)
-{
-    return true;
 }
 
 /*
@@ -151,7 +141,6 @@ function sfSendData($data)
         $response = wp_remote_post($endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
         return ($http_code == 200) ? true : false;
-
     } catch (\Exception $e) {
         // Debería registrarse en algun LOG 
         return false;

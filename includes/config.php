@@ -21,9 +21,11 @@ function register_cf7_to_sfmc_settings()
     register_setting($group, 'cf7tosfmc_auth_endpoint');
     register_setting($group, 'cf7tosfmc_endpoint');
     register_setting($group, 'cf7tosfmc_token');
-    register_setting($group, 'cf7tosfmc_token_expiration');
+    register_setting($group, 'cf7tosfmc_token_issued_date');
+    register_setting($group, 'cf7tosfmc_token_expire_time');
     register_setting($group, 'cf7tosfmc_user');
     register_setting($group, 'cf7tosfmc_pass');
+    register_setting($group, 'cf7tosfmc_user_security');
 }
 
 function cf7_to_sfmc_config_options()
@@ -69,13 +71,23 @@ function cf7_to_sfmc_config_options()
                 </tr>
 
                 <tr valign="top">
+                    <th scope="row">User security code</th>
+                    <td><input type="password" name="cf7tosfmc_user_security" value="<?php echo esc_attr(get_option('cf7tosfmc_user_security')); ?>" style="width:100%;" required /></td>
+                </tr>
+
+                <tr valign="top">
+                    <th scope="row">Token expiration (seconds)</th>
+                    <td><input type="number" name="cf7tosfmc_token_expire_time" value="<?php echo esc_attr(get_option('cf7tosfmc_token_expire_time')); ?>" style="width:100%;" required /></td>
+                </tr>
+
+                <tr valign="top">
                     <th scope="row">Current token</th>
                     <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token')); ?>" style="width:100%;" disabled /></td>
                 </tr>
 
                 <tr valign="top">
-                    <th scope="row">Current token expiration</th>
-                    <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token_expiration')); ?>" style="width:100%;" disabled /></td>
+                    <th scope="row">Current token issued date</th>
+                    <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token_issued_date')); ?>" style="width:100%;" disabled /></td>
                 </tr>
 
             </table>
