@@ -93,23 +93,26 @@ function sfAuthenticate()
                 'client_secret' => $client_secret,
                 'username' => $username,
                 'password' => $pass
-            ),
-            'blocking'    => true,
-            'headers'     => array(),
+            )
         );
 
         $response = wp_remote_post($auth_endpoint, $args);
+        $http_code = wp_remote_retrieve_response_code($response);
+        
+        if ($http_code == 200) {
+            update_option('cf7tosfmc_token', 'TODO');
+            update_option('cf7tosfmc_token_expiration', time());
 
-        wp_die($response);
+            // TODO !!!
+            return 'TODO';
+            //
 
-        update_option('cf7tosfmc_token', 'TODO');
-        update_option('cf7tosfmc_token_expiration', time());
-        // Pendiente de saber si SF me indica tiempo de expiración al darme token para usarlo al checkear validez.
+        } else {
+            return null;
+        }
     } catch (\Exception $e) {
         return null;
     }
-
-    return $access_token;
 }
 
 /*
@@ -140,20 +143,19 @@ function sfSendData($data)
         // Proceso de envio de información a SF
         $args = array(
             'body'    => $data,
-            'blocking'    => true,
             'headers'     => array(
                 'Authorization' => 'Bearer ' . $currentToken,
             ),
         );
 
         $response = wp_remote_post($endpoint, $args);
+        $http_code = wp_remote_retrieve_response_code($response);
+        return ($http_code == 200) ? true : false;
 
-        wp_die($response);
     } catch (\Exception $e) {
+        // Debería registrarse en algun LOG 
         return false;
     }
-
-    return true;
 }
 
 /*
