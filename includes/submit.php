@@ -6,84 +6,117 @@ add_action('wpcf7_before_send_mail', 'sfmc_call_after_form_submit');
 
 function sfmc_call_after_form_submit()
 {
-    // Obtiene array con datos del formulario
-    $data = [
-        'FirstName' => separateNames($_POST['your-name'])['firstName'],
-        'LastName' => separateNames($_POST['your-name'])['lastName'],
-        'Company' => $_POST['your-deal'],
-        'Subtipo__c' => 'Pymes',
-        'Canal__c' => 'INSIDESALES',
-        'Tipo_de_documento__c' => null,
-        'Numero_de_documento__c' => null,
-        'Phone' => null,
-        'MobilePhone' => null,
-        'Email' => $_POST['your-email'],
-        'Correo_electronico__c' => $_POST['your-email'],
-        'Tipo_via__c' => null,
-        'Nombre_via__c' => null,
-        'Numero__c' => null,
-        'Poblacion__c' => null,
-        'Provincia__c' => null,
-        'Comunidad_Autonoma__c' => null,
-        'Codigo_Postal__c' => null,
-        'NumberOfEmployees' => employeesInteger($_POST['menu-364']),
-        'Producto_Interesado__c' => null,
-    ];
+    // Comprueba si se ha configurado el plugin
+    if (checkOptions()) {
 
-    // Llamada a SFMC
+        // Obtiene array con datos del formulario
+        $data = [
+            'FirstName' => separateNames($_POST['your-name'])['firstName'],
+            'LastName' => separateNames($_POST['your-name'])['lastName'],
+            'Company' => $_POST['your-deal'],
+            'Subtipo__c' => 'Pymes',
+            'Canal__c' => 'INSIDESALES',
+            'Tipo_de_documento__c' => null,
+            'Numero_de_documento__c' => null,
+            'Phone' => null,
+            'MobilePhone' => null,
+            'Email' => $_POST['your-email'],
+            'Correo_electronico__c' => $_POST['your-email'],
+            'Tipo_via__c' => null,
+            'Nombre_via__c' => null,
+            'Numero__c' => null,
+            'Poblacion__c' => null,
+            'Provincia__c' => null,
+            'Comunidad_Autonoma__c' => null,
+            'Codigo_Postal__c' => null,
+            'NumberOfEmployees' => employeesInteger($_POST['menu-364']),
+            'Producto_Interesado__c' => null,
+        ];
 
-    $actualToken = get_option('cf7tosfmc_actual_token');
+        // Llamada a SFMC
 
-    if (!$actualToken || !sfCheckToken()) {
-        // Conecta para obtener token nuevo
-        $actualToken = sfAuthenticate();
-        // Actualiza option con nuevo token recibido
-        update_option('cf7tosfmc_actual_token', $actualToken);
+        $currenToken = get_option('cf7tosfmc_token');
+        $currentTokenExpiration = get_option('cf7tosfmc_token_expires');
+
+        if (!$currenToken || !sfCheckToken($currentTokenExpiration)) {
+            // Conecta para obtener token nuevo
+            $currentToken = sfAuthenticate();
+        }
+
+        if ($currentToken) {
+            sfSendData($data);
+        }
     }
+}
 
-    if ($actualToken) {
-        sfSendData($data);
+/*
+ * CFG - Comprueba si se ha configurado el plugin
+ * 
+ * @return Bool
+ */
+
+function checkOptions()
+{
+    $client_key = get_option('cf7tosfmc_client_key');
+    $client_secret = get_option('cf7tosfmc_client_secret');
+    $endpoint = get_option('cf7tosfmc_endpoint');
+    $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
+    $redirect_uri = get_option('cf7tosfmc_redirect_uri');
+
+    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$redirect_uri) { 
+        return false;
     }
+    return true;
 }
 
 
 /*
  * SF - Autenticación
+ * 
+ * @return String / null
  */
 
 function sfAuthenticate()
 {
-
     $client_key = get_option('cf7tosfmc_client_key');
     $client_secret = get_option('cf7tosfmc_client_secret');
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
+    $redirect_uri = get_option('cf7tosfmc_redirect_uri');
 
-    $access_token = 'TO-DO';
+    try {
+        $access_token = 'TO-DO';
+        update_option('cf7tosfmc_token', $access_token);
+        update_option('cf7tosfmc_token_expiration', time());
+        // Pendiente de saber si SF me indica tiempo de expiración al darme token para usarlo al checkear validez.
+    } catch (\Exception $e) {
+        return null;
+    }
 
     return $access_token;
 }
 
 /*
  * SF - Chequea validez de token almacenado
+ * 
+ * @param String $expiration Timestamp
+ * @return bool
  */
 
-function sfCheckToken()
+function sfCheckToken($expiration)
 {
-
-    $actualToken = get_option('cf7tosfmc_actual_token');
-    $endpoint = get_option('cf7tosfmc_endpoint');
-
     return true;
 }
 
 /*
  * SF - Envia datos de formulario
+ * 
+ * @param Array $data 
+ * @return bool
  */
 
-function sfSendData()
+function sfSendData($data)
 {
-
-    $actualToken = get_option('cf7tosfmc_actual_token');
+    $currentToken = get_option('cf7tosfmc_token');
     $endpoint = get_option('cf7tosfmc_endpoint');
 
     return true;
@@ -91,6 +124,9 @@ function sfSendData()
 
 /*
  * AUX - Devuelve un valor entero en función aun String recibido de valores prestabecidos en el formulario
+ * 
+ * @param String $employeesString 
+ * @return Integer
  */
 
 function employeesInteger($employeesString)
@@ -117,6 +153,9 @@ function employeesInteger($employeesString)
 
 /*
  * AUX - Separa nombre y apellidos
+ * 
+ * @param String $full_name 
+ * @return Array
  */
 
 function separateNames($full_name)
