@@ -40,32 +40,32 @@ function cf7_to_sfmc_config_options()
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Client Key</th>
-                    <td><input type="text" name="cf7tosfmc_client_key" value="<?php echo esc_attr(get_option('cf7tosfmc_client_key')); ?>" style="width:100%;" /></td>
+                    <td><input type="text" name="cf7tosfmc_client_key" value="<?php echo esc_attr(get_option('cf7tosfmc_client_key')); ?>" style="width:100%;" required /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Client secret</th>
-                    <td><input type="text" name="cf7tosfmc_client_secret" value="<?php echo esc_attr(get_option('cf7tosfmc_client_secret')); ?>" style="width:100%;" /></td>
+                    <td><input type="text" name="cf7tosfmc_client_secret" value="<?php echo esc_attr(get_option('cf7tosfmc_client_secret')); ?>" style="width:100%;" required /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Auth endpoint</th>
-                    <td><input type="text" name="cf7tosfmc_auth_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_auth_endpoint')); ?>" style="width:100%;" /></td>
+                    <td><input type="url" name="cf7tosfmc_auth_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_auth_endpoint')); ?>" style="width:100%;" required /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Endpoint</th>
-                    <td><input type="text" name="cf7tosfmc_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_endpoint')); ?>" style="width:100%;" /></td>
+                    <td><input type="url" name="cf7tosfmc_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_endpoint')); ?>" style="width:100%;" required /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">User</th>
-                    <td><input type="text" name="cf7tosfmc_user" value="<?php echo esc_attr(get_option('cf7tosfmc_user')); ?>" style="width:100%;" /></td>
+                    <td><input type="text" name="cf7tosfmc_user" value="<?php echo esc_attr(get_option('cf7tosfmc_user')); ?>" style="width:100%;" required /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Pass</th>
-                    <td><input type="text" name="cf7tosfmc_pass" value="<?php echo esc_attr(get_option('cf7tosfmc_pass')); ?>" style="width:100%;" /></td>
+                    <td><input type="password" name="cf7tosfmc_pass" value="<?php echo esc_attr(get_option('cf7tosfmc_pass')); ?>" style="width:100%;" required /></td>
                 </tr>
 
                 <tr valign="top">
