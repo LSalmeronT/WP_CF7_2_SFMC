@@ -64,7 +64,7 @@ function checkOptions()
     $user = get_option('cf7tosfmc_user');
     $pass = get_option('cf7tosfmc_pass');
 
-    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$user || !$pass) { 
+    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$user || !$pass) {
         return false;
     }
     return true;
@@ -82,12 +82,27 @@ function sfAuthenticate()
     $client_key = get_option('cf7tosfmc_client_key');
     $client_secret = get_option('cf7tosfmc_client_secret');
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
-    $user = get_option('cf7tosfmc_user');
+    $username = get_option('cf7tosfmc_user');
     $pass = get_option('cf7tosfmc_pass');
 
     try {
-        $access_token = 'TO-DO';
-        update_option('cf7tosfmc_token', $access_token);
+        $args = array(
+            'body'        => array(
+                'grant_type'    => 'password',
+                'client_id'   => $client_key,
+                'client_secret' => $client_secret,
+                'username' => $username,
+                'password' => $pass
+            ),
+            'blocking'    => true,
+            'headers'     => array(),
+        );
+
+        $response = wp_remote_post($auth_endpoint, $args);
+
+        wp_die($response);
+
+        update_option('cf7tosfmc_token', 'TODO');
         update_option('cf7tosfmc_token_expiration', time());
         // Pendiente de saber si SF me indica tiempo de expiración al darme token para usarlo al checkear validez.
     } catch (\Exception $e) {
@@ -112,7 +127,7 @@ function sfCheckToken($expiration)
 /*
  * SF - Envia datos de formulario
  * 
- * @param Array $data 
+ * @param Array $data Información recibida en el formulario
  * @return bool
  */
 
@@ -120,6 +135,23 @@ function sfSendData($data)
 {
     $currentToken = get_option('cf7tosfmc_token');
     $endpoint = get_option('cf7tosfmc_endpoint');
+
+    try {
+        // Proceso de envio de información a SF
+        $args = array(
+            'body'    => $data,
+            'blocking'    => true,
+            'headers'     => array(
+                'Authorization' => 'Bearer ' . $currentToken,
+            ),
+        );
+
+        $response = wp_remote_post($endpoint, $args);
+
+        wp_die($response);
+    } catch (\Exception $e) {
+        return false;
+    }
 
     return true;
 }

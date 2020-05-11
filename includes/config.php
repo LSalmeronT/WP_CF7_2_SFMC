@@ -77,6 +77,7 @@ function cf7_to_sfmc_config_options()
                     <th scope="row">Current token expiration</th>
                     <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token_expiration')); ?>" style="width:100%;" disabled /></td>
                 </tr>
+
             </table>
 
             <?php submit_button(); ?>
