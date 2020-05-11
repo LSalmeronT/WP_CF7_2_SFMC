@@ -9,5 +9,6 @@
  * Author URI: http://www.everis.com
  */
 
+include('includes/logging.php');
 include('includes/config.php');
 include('includes/submit.php');

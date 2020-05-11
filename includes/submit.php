@@ -4,6 +4,7 @@
 
 add_action('wpcf7_before_send_mail', 'sfmc_call_after_form_submit');
 
+
 function sfmc_call_after_form_submit()
 {
     // Comprueba si se ha configurado el plugin
@@ -11,7 +12,7 @@ function sfmc_call_after_form_submit()
 
         // Genera array con datos del formulario
         $data = [
-            'FirstName' => separateNames($_POST['your-name'])['firstName'], 
+            'FirstName' => separateNames($_POST['your-name'])['firstName'],
             'LastName' => separateNames($_POST['your-name'])['lastName'],
             'Company' => $_POST['your-deal'],
             'Subtipo__c' => 'Pymes',
@@ -39,7 +40,7 @@ function sfmc_call_after_form_submit()
         $currentTokenIssuedDate = get_option('cf7tosfmc_token_issued_date');
 
         // Si no es valido, lo obtiene
-        if (!$currenToken || (time() >= $currentTokenIssuedDate + $currentTokenExpireTime )) {
+        if (!$currenToken || (time() >= $currentTokenIssuedDate + $currentTokenExpireTime)) {
             // Conecta para obtener token nuevo
             $currentToken = sfAuthenticate();
         }
@@ -84,6 +85,7 @@ function checkOptions()
 
 function sfAuthenticate()
 {
+    sfAddLog('INFO', 'Autentication started');
     $client_key = get_option('cf7tosfmc_client_key');
     $client_secret = get_option('cf7tosfmc_client_secret');
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
@@ -108,11 +110,14 @@ function sfAuthenticate()
         if ($http_code == 200) {
             update_option('cf7tosfmc_token', 'TODO'); // TODO => Obtener 'access_token' de $response
             update_option('cf7tosfmc_token_issued_date', time());
+            sfAddLog('SUCCESS', 'Autentication done!');
             return 'TODO'; // TODO => Obtener 'access_token' de $response
         } else {
+            sfAddLog('ERROR', 'Autentication fail! Error code: ' . $http_code);
             return null;
         }
     } catch (\Exception $e) {
+        sfAddLog('ERROR', 'Autentication fail!');
         return null;
     }
 }
@@ -126,6 +131,7 @@ function sfAuthenticate()
 
 function sfSendData($data)
 {
+    sfAddLog('INFO', 'Sending data');
     $currentToken = get_option('cf7tosfmc_token');
     $endpoint = get_option('cf7tosfmc_endpoint');
 
@@ -138,11 +144,19 @@ function sfSendData($data)
             ),
         );
 
+        sfAddLog('INFO', 'Sending data body : ' . json_encode($args));
+
         $response = wp_remote_post($endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
-        return ($http_code == 200) ? true : false;
+        if ($http_code == 200) {
+            sfAddLog('SUCCESS', 'Sending data done!');
+            return true;
+        } else {
+            sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code);
+            return false;
+        }
     } catch (\Exception $e) {
-        // Debería registrarse en algun LOG 
+        sfAddLog('ERROR', 'Error sending data!');
         return false;
     }
 }

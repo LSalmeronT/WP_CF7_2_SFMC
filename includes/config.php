@@ -26,14 +26,32 @@ function register_cf7_to_sfmc_settings()
     register_setting($group, 'cf7tosfmc_user');
     register_setting($group, 'cf7tosfmc_pass');
     register_setting($group, 'cf7tosfmc_user_security');
+    register_setting($group, 'cf7tosfmc_last_logs');
 }
 
 function cf7_to_sfmc_config_options()
 {
+    $preTest = sfAuthenticate();
 ?>
     <div class="wrap">
-        <h1>Configuración CF7 to SF</h1>
+        <h1>CF7 to SF Settings</h1>
 
+        <?php
+        if ($preTest) {
+        ?>
+            <div id="setting-error-settings_updated" class="notice notice-success settings-error is-dismissible">
+                <p><strong>Autenticación realizada con exito usando la configuración actual</strong></p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Descartar este aviso.</span></button>
+            </div>
+        <?php
+        } else {
+        ?>
+            <div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible">
+                <p><strong>Autenticación fallida usando la configuración actual</strong></p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Descartar este aviso.</span></button>
+            </div>
+        <?php
+        }
+
+        ?>
         <form method="post" action="options.php">
 
             <?php settings_fields('cf7-to-sfmc'); ?>
@@ -87,7 +105,21 @@ function cf7_to_sfmc_config_options()
 
                 <tr valign="top">
                     <th scope="row">Current token issued date</th>
-                    <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token_issued_date')); ?>" style="width:100%;" disabled /></td>
+                    <td><input type="text" name="" value="<?php if (get_option('cf7tosfmc_token_issued_date')) {
+                                                                echo date("d-m-Y H:i:s", esc_attr(get_option('cf7tosfmc_token_issued_date')));
+                                                            } ?>" style="width:100%;" disabled /></td>
+                </tr>
+
+                <tr valign="top">
+                    <th scope="row">Latest logs</th>
+                    <td><textarea name="" height="150px" disabled><?php 
+                        if(get_option('cf7tosfmc_last_logs')){
+                            foreach(get_option('cf7tosfmc_last_logs') as $row){
+                                echo $row[0]." - ".$row[1]." - ".$row[2]."\r\n";
+                            }
+                        }
+                    
+                    ?></textarea></td>
                 </tr>
 
             </table>
