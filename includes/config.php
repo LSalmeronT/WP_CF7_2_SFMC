@@ -22,7 +22,8 @@ function register_cf7_to_sfmc_settings()
     register_setting($group, 'cf7tosfmc_endpoint');
     register_setting($group, 'cf7tosfmc_token');
     register_setting($group, 'cf7tosfmc_token_expiration');
-    register_setting($group, 'cf7tosfmc_redirect_uri');
+    register_setting($group, 'cf7tosfmc_user');
+    register_setting($group, 'cf7tosfmc_pass');
 }
 
 function cf7_to_sfmc_config_options()
@@ -58,18 +59,23 @@ function cf7_to_sfmc_config_options()
                 </tr>
 
                 <tr valign="top">
-                    <th scope="row">Callback URL</th>
-                    <td><input type="text" name="cf7tosfmc_redirect_uri" value="<?php echo esc_attr(get_option('cf7tosfmc_redirect_uri')); ?>" style="width:100%;" /></td>
+                    <th scope="row">User</th>
+                    <td><input type="text" name="cf7tosfmc_user" value="<?php echo esc_attr(get_option('cf7tosfmc_user')); ?>" style="width:100%;" /></td>
+                </tr>
+
+                <tr valign="top">
+                    <th scope="row">Pass</th>
+                    <td><input type="text" name="cf7tosfmc_pass" value="<?php echo esc_attr(get_option('cf7tosfmc_pass')); ?>" style="width:100%;" /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Current token</th>
-                    <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token')); ?>" style="width:100%;" disabled/></td>
+                    <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token')); ?>" style="width:100%;" disabled /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Current token expiration</th>
-                    <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token_expiration')); ?>" style="width:100%;" disabled/></td>
+                    <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token_expiration')); ?>" style="width:100%;" disabled /></td>
                 </tr>
             </table>
 

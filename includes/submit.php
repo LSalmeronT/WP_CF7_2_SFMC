@@ -61,9 +61,10 @@ function checkOptions()
     $client_secret = get_option('cf7tosfmc_client_secret');
     $endpoint = get_option('cf7tosfmc_endpoint');
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
-    $redirect_uri = get_option('cf7tosfmc_redirect_uri');
+    $user = get_option('cf7tosfmc_user');
+    $pass = get_option('cf7tosfmc_pass');
 
-    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$redirect_uri) { 
+    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$user || !$pass) { 
         return false;
     }
     return true;
@@ -81,7 +82,8 @@ function sfAuthenticate()
     $client_key = get_option('cf7tosfmc_client_key');
     $client_secret = get_option('cf7tosfmc_client_secret');
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
-    $redirect_uri = get_option('cf7tosfmc_redirect_uri');
+    $user = get_option('cf7tosfmc_user');
+    $pass = get_option('cf7tosfmc_pass');
 
     try {
         $access_token = 'TO-DO';
