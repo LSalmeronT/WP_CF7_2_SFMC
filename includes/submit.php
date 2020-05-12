@@ -153,19 +153,17 @@ function sfSendData($data)
         $response = wp_remote_post($endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
 
-        if (is_wp_error($response)) {
-            sfAddLog('ERROR', 'Sending data fail! Error: ' . $response->get_error_code() . ' - ' . $response->get_error_message());
-            return false;
+        if ($http_code == 201) {
+            sfAddLog('SUCCESS', 'Sending data done!');
+            return true;
         } else {
-            if ($http_code == 201) {
-                sfAddLog('SUCCESS', 'Sending data done!');
-                return true;
+            if (is_wp_error($response)) {
+                sfAddLog('ERROR', 'Sending data fail! Error: ' . $response->get_error_code() . ' - ' . $response->get_error_message());
             } else {
-                sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code . ' - Error message: ' . $response);
-                return false;
+                sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code . ' - Error message: ' . $response['body']);
             }
+            return false;
         }
-
     } catch (\Exception $e) {
         sfAddLog('ERROR', 'Error sending data!');
         return false;
