@@ -16,10 +16,8 @@ function sfReorderLog($actualLog){
 
     // Ordena por el campo 'timestamp' decreciente
     usort($actualLog, "sfLogCmp");
-    // Solo mantiene los 100 primeros indices
-    $actualLog = array_slice($actualLog, 0, 100);
-    
-    return $actualLog;
+    // Solo mantiene los 100 ultimos (primeros tras la reordenacion) logs
+    return array_slice($actualLog, 0, 100);
 
 }
 

@@ -26,6 +26,8 @@ function register_cf7_to_sfmc_settings()
     register_setting($group, 'cf7tosfmc_user');
     register_setting($group, 'cf7tosfmc_pass');
     register_setting($group, 'cf7tosfmc_last_logs');
+    register_setting($group, 'cf7tosfmc_data_mapping');
+    register_setting($group, 'cf7tosfmc_form_ids');
 }
 
 function cf7_to_sfmc_config_options()
@@ -93,6 +95,16 @@ function cf7_to_sfmc_config_options()
                 </tr>
 
                 <tr valign="top">
+                    <th scope="row">Form IDs (Comma separated)</th>
+                    <td><input type="text" name="cf7tosfmc_form_ids" value="<?php echo esc_attr(get_option('cf7tosfmc_form_ids')); ?>" style="width:100%;" required /></td>
+                </tr>
+
+                <tr valign="top">
+                    <th scope="row">Data mapping</th>
+                    <td><textarea name="cf7tosfmc_data_mapping" style="width:100%;height:150px;"><?php echo esc_attr(get_option('cf7tosfmc_data_mapping')); ?></textarea></td>
+                </tr>
+
+                <tr valign="top">
                     <th scope="row">Current token</th>
                     <td><input type="text" name="" value="<?php echo esc_attr(get_option('cf7tosfmc_token')); ?>" style="width:100%;" disabled /></td>
                 </tr>
@@ -106,13 +118,12 @@ function cf7_to_sfmc_config_options()
 
                 <tr valign="top">
                     <th scope="row">Latest 100 logs</th>
-                    <td><textarea style="width:100%;height:150px;" disabled><?php 
-                        if(is_array(get_option('cf7tosfmc_last_logs'))){
-                            foreach(get_option('cf7tosfmc_last_logs') as $row){
-                                echo $row[0]." - ".$row[1]." - ".$row[2]."\r\n";
-                            }
+                    <td><textarea style="width:100%;height:150px;" disabled><?php
+                    if (is_array(get_option('cf7tosfmc_last_logs'))) {
+                        foreach (get_option('cf7tosfmc_last_logs') as $row) {
+                            echo $row[0] . " - " . $row[1] . " - " . $row[2] . "\r\n";
                         }
-                    
+                    }
                     ?></textarea></td>
                 </tr>
 

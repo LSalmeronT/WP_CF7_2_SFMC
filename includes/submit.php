@@ -10,44 +10,28 @@ function sfmc_call_after_form_submit()
     // Comprueba si se ha configurado el plugin
     if (checkOptions()) {
 
-        // Genera array con datos del formulario
-        $data = [
-            'FirstName' => separateNames($_POST['your-name'])['firstName'],
-            'LastName' => separateNames($_POST['your-name'])['lastName'],
-            'Company' => $_POST['your-deal'],
-            'Subtipo__c' => 'Pymes',
-            'Canal__c' => 'INSIDESALES',
-            'Tipo_de_documento__c' => null,
-            'Numero_de_documento__c' => null,
-            'Phone' => null,
-            'MobilePhone' => null,
-            'Email' => $_POST['your-email'],
-            'Correo_electronico__c' => $_POST['your-email'],
-            'Tipo_via__c' => null,
-            'Nombre_via__c' => null,
-            'Numero__c' => null,
-            'Poblacion__c' => null,
-            'Provincia__c' => null,
-            'Comunidad_Autonoma__c' => null,
-            'Codigo_Postal__c' => null,
-            'NumberOfEmployees' => employeesInteger($_POST['menu-364']),
-            'Producto_Interesado__c' => null,
-        ];
+        // Comprueba si el ID de formulario recibido concuerda con alguno de los configurados
+        $currentFormId = $_POST['_wpcf7'];
+        $allowedFormIds = explode(",", get_option('cf7tosfmc_form_ids'));
+        
+        if(in_array($currentFormId, $allowedFormIds)){
+            $data = sfGenerateData();
 
-        // Comprueba validez de token almacenado
-        $currenToken = get_option('cf7tosfmc_token');
-        $currentTokenExpireTime = get_option('cf7tosfmc_token_expire_time');
-        $currentTokenIssuedDate = get_option('cf7tosfmc_token_issued_date');
-
-        // Si no es valido, lo obtiene
-        if (!$currenToken || (time() >= $currentTokenIssuedDate + $currentTokenExpireTime)) {
-            // Conecta para obtener token nuevo
-            $currentToken = sfAuthenticate();
-        }
-
-        // Envia información del formulario
-        if ($currentToken) {
-            sfSendData($data);
+            // Comprueba validez de token almacenado
+            $currenToken = get_option('cf7tosfmc_token');
+            $currentTokenExpireTime = get_option('cf7tosfmc_token_expire_time');
+            $currentTokenIssuedDate = get_option('cf7tosfmc_token_issued_date');
+    
+            // Si no es valido, lo obtiene
+            if (!$currenToken || (time() >= $currentTokenIssuedDate + $currentTokenExpireTime)) {
+                // Conecta para obtener token nuevo
+                $currentToken = sfAuthenticate();
+            }
+    
+            // Envia información del formulario
+            if ($currentToken) {
+                sfSendData($data);
+            }
         }
     }
 }
@@ -66,14 +50,63 @@ function checkOptions()
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
     $user = get_option('cf7tosfmc_user');
     $pass = get_option('cf7tosfmc_pass');
-    $userSecurity = get_option('cf7tosfmc_user_security');
+    $dataMapping = get_option('cf7tosfmc_data_mapping');
     $tokenExpireTime = get_option('cf7tosfmc_token_expire_time');
 
     // Por el momento solo compruebo que ninguno esté vacio. 
-    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$user || !$pass || !$userSecurity || !$tokenExpireTime) {
+    if (!$client_key || !$client_secret || !$endpoint || !$auth_endpoint || !$user || !$pass || !$tokenExpireTime || !$dataMapping) {
         return false;
     }
     return true;
+}
+
+/*
+ * SF - Genera array con información del formulario basandose en el mapeado configurado
+ * 
+ * @return String / null
+ */
+
+function sfGenerateData()
+{
+    $dataMapping = get_option('cf7tosfmc_data_mapping');
+    $lines = explode(PHP_EOL, $dataMapping);
+    $data = array();
+    foreach ($lines as $line) {
+        $lineArray = str_getcsv($line, ":");
+        switch (count($lineArray)) {
+            case 1:
+                $data[$lineArray[0]] = null;
+                break;
+            case 2:
+                if (isset($_POST[$lineArray[1]])) {
+                    $data[$lineArray[0]] = $_POST[$lineArray[1]];
+                } else {
+                    $data[$lineArray[0]] = null;
+                }
+                break;
+            case 3:
+                if ($lineArray[1] == 'string') {
+                    $data[$lineArray[0]] = $lineArray[2];
+                } else {
+                    if (isset($_POST[$lineArray[1]])) {
+                        $data[$lineArray[0]] = $lineArray[2]($_POST[$lineArray[1]]);
+                    } else {
+                        $data[$lineArray[0]] = null;
+                    }
+                }
+                break;
+            case 4:
+                if (isset($_POST[$lineArray[1]])) {
+                    $data[$lineArray[0]] = $lineArray[2]($_POST[$lineArray[1]], $lineArray[3]);
+                } else {
+                    $data[$lineArray[0]] = null;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return $data;
 }
 
 
@@ -110,7 +143,7 @@ function sfAuthenticate()
             update_option('cf7tosfmc_token', $responseBody['access_token']);
             update_option('cf7tosfmc_token_issued_date', time());
             sfAddLog('SUCCESS', 'Autentication done! - ' . $response['body']);
-            return $responseBody['access_token']; // TODO => Obtener 'access_token' de $response
+            return $responseBody['access_token'];
         } else {
             if (is_wp_error($response)) {
                 sfAddLog('ERROR', 'Autentication fail! Error: ' . $response->get_error_code() . ' - ' . $response->get_error_message());
@@ -203,10 +236,11 @@ function employeesInteger($employeesString)
  * AUX - Separa nombre y apellidos
  * 
  * @param String $full_name 
+ * @param String Index  0-1
  * @return Array
  */
 
-function separateNames($full_name)
+function separateNames($full_name, $index)
 {
     $tokens = explode(' ', trim($full_name));
     $names = array();
@@ -253,5 +287,9 @@ function separateNames($full_name)
 
     $firstName    = mb_convert_case($firstName, MB_CASE_TITLE, 'UTF-8');
     $lastName  = mb_convert_case($lastName, MB_CASE_TITLE, 'UTF-8');
-    return ['firstName' => $firstName, 'lastName' => $lastName];
+    if ($index == "0") {
+        return $firstName;
+    } else {
+        return $lastName;
+    }
 }
