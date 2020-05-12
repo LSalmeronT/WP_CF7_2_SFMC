@@ -141,9 +141,10 @@ function sfSendData($data)
     try {
         // Proceso de envio de información a SF
         $args = array(
-            'body'    => $data,
+            'body'    => json_encode($data),
             'headers'     => array(
                 'Authorization' => 'Bearer ' . $currentToken,
+                'Content-Type' => 'application/json; charset=utf-8',
             ),
         );
 
@@ -152,7 +153,12 @@ function sfSendData($data)
         $response = wp_remote_post($endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
         if ($http_code == 200) {
-            sfAddLog('SUCCESS', 'Sending data done!');
+            $responseBody = json_decode(wp_remote_retrieve_body( $response ), TRUE );
+            if($responseBody['success']) {
+                sfAddLog('SUCCESS', 'Sending data done!');
+            } else {
+                sfAddLog('WARNING', 'Something Wrong! : '.$response['body']);
+            }
             return true;
         } else {
             sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code. ' - Error message: '.$response);
