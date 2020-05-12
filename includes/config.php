@@ -58,6 +58,20 @@ function cf7_to_sfmc_config_options()
             <?php settings_fields('cf7-to-sfmc'); ?>
             <?php do_settings_sections('cf7-to-sfmc'); ?>
 
+            <h3>Endpoints</h3><hr/>
+            <table class="form-table">
+               <tr valign="top">
+                    <th scope="row">Auth endpoint</th>
+                    <td><input type="url" name="cf7tosfmc_auth_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_auth_endpoint')); ?>" style="width:100%;" required /></td>
+                </tr>
+
+                <tr valign="top">
+                    <th scope="row">Data endpoint</th>
+                    <td><input type="url" name="cf7tosfmc_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_endpoint')); ?>" style="width:100%;" required /></td>
+                </tr>
+            </table>
+
+            <h3>Authentication</h3><hr/>
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Client Key</th>
@@ -67,16 +81,6 @@ function cf7_to_sfmc_config_options()
                 <tr valign="top">
                     <th scope="row">Client secret</th>
                     <td><input type="text" name="cf7tosfmc_client_secret" value="<?php echo esc_attr(get_option('cf7tosfmc_client_secret')); ?>" style="width:100%;" required /></td>
-                </tr>
-
-                <tr valign="top">
-                    <th scope="row">Auth endpoint</th>
-                    <td><input type="url" name="cf7tosfmc_auth_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_auth_endpoint')); ?>" style="width:100%;" required /></td>
-                </tr>
-
-                <tr valign="top">
-                    <th scope="row">Endpoint</th>
-                    <td><input type="url" name="cf7tosfmc_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_endpoint')); ?>" style="width:100%;" required /></td>
                 </tr>
 
                 <tr valign="top">
@@ -94,15 +98,29 @@ function cf7_to_sfmc_config_options()
                     <td><input type="number" name="cf7tosfmc_token_expire_time" value="<?php echo esc_attr(get_option('cf7tosfmc_token_expire_time')); ?>" style="width:100%;" required /></td>
                 </tr>
 
+            </table>
+
+            <h3>Form filter and data mapping</h3><hr/>
+            <table class="form-table">
+
                 <tr valign="top">
                     <th scope="row">Form IDs (Comma separated)</th>
-                    <td><input type="text" name="cf7tosfmc_form_ids" value="<?php echo esc_attr(get_option('cf7tosfmc_form_ids')); ?>" style="width:100%;" required /></td>
+                    <td><input type="text" name="cf7tosfmc_form_ids" value="<?php echo esc_attr(get_option('cf7tosfmc_form_ids')); ?>" style="width:100%;" required />
+                    </td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Data mapping</th>
-                    <td><textarea name="cf7tosfmc_data_mapping" style="width:100%;height:150px;"><?php echo esc_attr(get_option('cf7tosfmc_data_mapping')); ?></textarea></td>
+                    <td><textarea name="cf7tosfmc_data_mapping" style="width:100%;height:150px;"><?php echo esc_attr(get_option('cf7tosfmc_data_mapping')); ?></textarea>
+                    </td>
                 </tr>
+
+            </table>
+            
+            <?php submit_button(); ?>
+
+            <h3>Debugging</h3><hr/>
+            <table class="form-table">
 
                 <tr valign="top">
                     <th scope="row">Current token</th>
@@ -119,17 +137,15 @@ function cf7_to_sfmc_config_options()
                 <tr valign="top">
                     <th scope="row">Latest 100 logs</th>
                     <td><textarea style="width:100%;height:150px;" disabled><?php
-                    if (is_array(get_option('cf7tosfmc_last_logs'))) {
-                        foreach (get_option('cf7tosfmc_last_logs') as $row) {
-                            echo $row[0] . " - " . $row[1] . " - " . $row[2] . "\r\n";
-                        }
-                    }
-                    ?></textarea></td>
+                                                                            if (is_array(get_option('cf7tosfmc_last_logs'))) {
+                                                                                foreach (get_option('cf7tosfmc_last_logs') as $row) {
+                                                                                    echo $row[0] . " - " . $row[1] . " - " . $row[2] . "\r\n";
+                                                                                }
+                                                                            }
+                                                                            ?></textarea></td>
                 </tr>
 
             </table>
-
-            <?php submit_button(); ?>
 
         </form>
     </div>

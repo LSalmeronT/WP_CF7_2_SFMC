@@ -13,21 +13,21 @@ function sfmc_call_after_form_submit()
         // Comprueba si el ID de formulario recibido concuerda con alguno de los configurados
         $currentFormId = $_POST['_wpcf7'];
         $allowedFormIds = explode(",", get_option('cf7tosfmc_form_ids'));
-        
-        if(in_array($currentFormId, $allowedFormIds)){
+
+        if (in_array($currentFormId, $allowedFormIds)) {
             $data = sfGenerateData();
 
             // Comprueba validez de token almacenado
             $currenToken = get_option('cf7tosfmc_token');
             $currentTokenExpireTime = get_option('cf7tosfmc_token_expire_time');
             $currentTokenIssuedDate = get_option('cf7tosfmc_token_issued_date');
-    
+
             // Si no es valido, lo obtiene
             if (!$currenToken || (time() >= $currentTokenIssuedDate + $currentTokenExpireTime)) {
                 // Conecta para obtener token nuevo
                 $currentToken = sfAuthenticate();
             }
-    
+
             // Envia información del formulario
             if ($currentToken) {
                 sfSendData($data);
@@ -73,37 +73,45 @@ function sfGenerateData()
     $data = array();
     foreach ($lines as $line) {
         $lineArray = str_getcsv($line, ":");
-        switch (count($lineArray)) {
-            case 1:
-                $data[$lineArray[0]] = null;
-                break;
-            case 2:
-                if (isset($_POST[$lineArray[1]])) {
-                    $data[$lineArray[0]] = $_POST[$lineArray[1]];
-                } else {
+        if (trim($lineArray[0]) != '') {
+            switch (count($lineArray)) {
+                case 1:
                     $data[$lineArray[0]] = null;
-                }
-                break;
-            case 3:
-                if ($lineArray[1] == 'string') {
-                    $data[$lineArray[0]] = $lineArray[2];
-                } else {
+                    break;
+                case 2:
                     if (isset($_POST[$lineArray[1]])) {
-                        $data[$lineArray[0]] = $lineArray[2]($_POST[$lineArray[1]]);
+                        $data[$lineArray[0]] = $_POST[$lineArray[1]];
                     } else {
                         $data[$lineArray[0]] = null;
                     }
-                }
-                break;
-            case 4:
-                if (isset($_POST[$lineArray[1]])) {
-                    $data[$lineArray[0]] = $lineArray[2]($_POST[$lineArray[1]], $lineArray[3]);
-                } else {
-                    $data[$lineArray[0]] = null;
-                }
-                break;
-            default:
-                break;
+                    break;
+                case 3:
+                    if ($lineArray[1] == 'string') {
+                        $data[$lineArray[0]] = $lineArray[2];
+                    } else if ($lineArray[1] == 'integer') {
+                        $data[$lineArray[0]] = (int) $lineArray[2];
+                    } else if ($lineArray[1] == 'float') {
+                        $data[$lineArray[0]] = (float) $lineArray[2];
+                    } else if ($lineArray[1] == 'boolean') {
+                        $data[$lineArray[0]] = (bool) $lineArray[2];
+                    } else {
+                        if (isset($_POST[$lineArray[1]])) {
+                            $data[$lineArray[0]] = $lineArray[2]($_POST[$lineArray[1]]);
+                        } else {
+                            $data[$lineArray[0]] = null;
+                        }
+                    }
+                    break;
+                case 4:
+                    if (isset($_POST[$lineArray[1]])) {
+                        $data[$lineArray[0]] = $lineArray[2]($_POST[$lineArray[1]], $lineArray[3]);
+                    } else {
+                        $data[$lineArray[0]] = null;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
     return $data;
@@ -118,7 +126,7 @@ function sfGenerateData()
 
 function sfAuthenticate()
 {
-    sfAddLog('INFO', 'Autentication started');
+    sfAddLog('INFO', 'Authentication started');
     $client_key = get_option('cf7tosfmc_client_key');
     $client_secret = get_option('cf7tosfmc_client_secret');
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
@@ -142,18 +150,18 @@ function sfAuthenticate()
             $responseBody = json_decode(wp_remote_retrieve_body($response), TRUE);
             update_option('cf7tosfmc_token', $responseBody['access_token']);
             update_option('cf7tosfmc_token_issued_date', time());
-            sfAddLog('SUCCESS', 'Autentication done! - ' . $response['body']);
+            sfAddLog('SUCCESS', 'Authentication done! - ' . $response['body']);
             return $responseBody['access_token'];
         } else {
             if (is_wp_error($response)) {
-                sfAddLog('ERROR', 'Autentication fail! Error: ' . $response->get_error_code() . ' - ' . $response->get_error_message());
+                sfAddLog('ERROR', 'Authentication fail! Error: ' . $response->get_error_code() . ' - ' . $response->get_error_message());
             } else {
-                sfAddLog('ERROR', 'Autentication fail! Error: ' . $http_code . ' - ' . $response['body']);
+                sfAddLog('ERROR', 'Authentication fail! Error: ' . $http_code . ' - ' . $response['body']);
             }
             return null;
         }
     } catch (\Exception $e) {
-        sfAddLog('ERROR', 'Autentication fail!');
+        sfAddLog('ERROR', 'Authentication fail!');
         return null;
     }
 }
@@ -260,10 +268,12 @@ function separateNames($full_name, $index)
     $firstName = $lastName = "";
     switch ($num_names) {
         case 0:
-            $firstName = '';
+            $firstName = '-';
+            $lastName  = '-';
             break;
         case 1:
             $firstName = $names[0];
+            $lastName  = '-';
             break;
         case 2:
             $firstName    = $names[0];
