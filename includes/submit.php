@@ -91,7 +91,6 @@ function sfAuthenticate()
     $auth_endpoint = get_option('cf7tosfmc_auth_endpoint');
     $username = get_option('cf7tosfmc_user');
     $pass = get_option('cf7tosfmc_pass');
-    $userSecurity = get_option('cf7tosfmc_user_security');
 
     try {
         $args = array(
@@ -100,18 +99,18 @@ function sfAuthenticate()
                 'client_id'   => $client_key,
                 'client_secret' => $client_secret,
                 'username' => $username,
-                'password' => $pass . $userSecurity
+                'password' => $pass
             )
         );
 
         $response = wp_remote_post($auth_endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
-
         if ($http_code == 200) {
-            update_option('cf7tosfmc_token', 'TODO'); // TODO => Obtener 'access_token' de $response
+            $responseBody = json_decode(wp_remote_retrieve_body( $response ), TRUE );
+            update_option('cf7tosfmc_token', $responseBody['access_token']); 
             update_option('cf7tosfmc_token_issued_date', time());
-            sfAddLog('SUCCESS', 'Autentication done!');
-            return 'TODO'; // TODO => Obtener 'access_token' de $response
+            sfAddLog('SUCCESS', 'Autentication done! - '.$response['body']);
+            return $responseBody['access_token']; // TODO => Obtener 'access_token' de $response
         } else {
             if(is_wp_error($response)) {
                 sfAddLog('ERROR', 'Autentication fail! Error: ' . $response->get_error_code().' - '.$response->get_error_message());

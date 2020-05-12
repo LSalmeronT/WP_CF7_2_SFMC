@@ -25,7 +25,6 @@ function register_cf7_to_sfmc_settings()
     register_setting($group, 'cf7tosfmc_token_expire_time');
     register_setting($group, 'cf7tosfmc_user');
     register_setting($group, 'cf7tosfmc_pass');
-    register_setting($group, 'cf7tosfmc_user_security');
     register_setting($group, 'cf7tosfmc_last_logs');
 }
 
@@ -89,11 +88,6 @@ function cf7_to_sfmc_config_options()
                 </tr>
 
                 <tr valign="top">
-                    <th scope="row">User security code</th>
-                    <td><input type="password" name="cf7tosfmc_user_security" value="<?php echo esc_attr(get_option('cf7tosfmc_user_security')); ?>" style="width:100%;" required /></td>
-                </tr>
-
-                <tr valign="top">
                     <th scope="row">Token expiration (seconds)</th>
                     <td><input type="number" name="cf7tosfmc_token_expire_time" value="<?php echo esc_attr(get_option('cf7tosfmc_token_expire_time')); ?>" style="width:100%;" required /></td>
                 </tr>
@@ -112,8 +106,7 @@ function cf7_to_sfmc_config_options()
 
                 <tr valign="top">
                     <th scope="row">Latest 100 logs</th>
-                    <td><input type="hidden" name="cf7tosfmc_last_logs" value="<?php echo esc_attr(get_option('cf7tosfmc_last_logs')); ?>" />
-                    <textarea style="width:100%;height:150px;" disabled><?php 
+                    <td><textarea style="width:100%;height:150px;" disabled><?php 
                         if(is_array(get_option('cf7tosfmc_last_logs'))){
                             foreach(get_option('cf7tosfmc_last_logs') as $row){
                                 echo $row[0]." - ".$row[1]." - ".$row[2]."\r\n";
