@@ -106,16 +106,16 @@ function sfAuthenticate()
         $response = wp_remote_post($auth_endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
         if ($http_code == 200) {
-            $responseBody = json_decode(wp_remote_retrieve_body( $response ), TRUE );
-            update_option('cf7tosfmc_token', $responseBody['access_token']); 
+            $responseBody = json_decode(wp_remote_retrieve_body($response), TRUE);
+            update_option('cf7tosfmc_token', $responseBody['access_token']);
             update_option('cf7tosfmc_token_issued_date', time());
-            sfAddLog('SUCCESS', 'Autentication done! - '.$response['body']);
+            sfAddLog('SUCCESS', 'Autentication done! - ' . $response['body']);
             return $responseBody['access_token']; // TODO => Obtener 'access_token' de $response
         } else {
-            if(is_wp_error($response)) {
-                sfAddLog('ERROR', 'Autentication fail! Error: ' . $response->get_error_code().' - '.$response->get_error_message());
+            if (is_wp_error($response)) {
+                sfAddLog('ERROR', 'Autentication fail! Error: ' . $response->get_error_code() . ' - ' . $response->get_error_message());
             } else {
-                sfAddLog('ERROR', 'Autentication fail! Error: ' . $http_code.' - '.$response['body']);
+                sfAddLog('ERROR', 'Autentication fail! Error: ' . $http_code . ' - ' . $response['body']);
             }
             return null;
         }
@@ -152,18 +152,20 @@ function sfSendData($data)
 
         $response = wp_remote_post($endpoint, $args);
         $http_code = wp_remote_retrieve_response_code($response);
-        if ($http_code == 200) {
-            $responseBody = json_decode(wp_remote_retrieve_body( $response ), TRUE );
-            if($responseBody['success']) {
-                sfAddLog('SUCCESS', 'Sending data done!');
-            } else {
-                sfAddLog('WARNING', 'Something Wrong! : '.$response['body']);
-            }
-            return true;
-        } else {
-            sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code. ' - Error message: '.$response);
+
+        if (is_wp_error($response)) {
+            sfAddLog('ERROR', 'Sending data fail! Error: ' . $response->get_error_code() . ' - ' . $response->get_error_message());
             return false;
+        } else {
+            if ($http_code == 201) {
+                sfAddLog('SUCCESS', 'Sending data done!');
+                return true;
+            } else {
+                sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code . ' - Error message: ' . $response);
+                return false;
+            }
         }
+
     } catch (\Exception $e) {
         sfAddLog('ERROR', 'Error sending data!');
         return false;
