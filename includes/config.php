@@ -111,9 +111,10 @@ function cf7_to_sfmc_config_options()
                 </tr>
 
                 <tr valign="top">
-                    <th scope="row">Latest logs</th>
-                    <td><textarea name="" height="150px" disabled><?php 
-                        if(get_option('cf7tosfmc_last_logs')){
+                    <th scope="row">Latest 100 logs</th>
+                    <td><input type="hidden" name="cf7tosfmc_last_logs" value="<?php echo esc_attr(get_option('cf7tosfmc_last_logs')); ?>" />
+                    <textarea style="width:100%;height:150px;" disabled><?php 
+                        if(is_array(get_option('cf7tosfmc_last_logs'))){
                             foreach(get_option('cf7tosfmc_last_logs') as $row){
                                 echo $row[0]." - ".$row[1]." - ".$row[2]."\r\n";
                             }

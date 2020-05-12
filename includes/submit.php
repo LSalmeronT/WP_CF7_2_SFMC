@@ -113,7 +113,11 @@ function sfAuthenticate()
             sfAddLog('SUCCESS', 'Autentication done!');
             return 'TODO'; // TODO => Obtener 'access_token' de $response
         } else {
-            sfAddLog('ERROR', 'Autentication fail! Error code: ' . $http_code);
+            if(is_wp_error($response)) {
+                sfAddLog('ERROR', 'Autentication fail! Error: ' . $response->get_error_code().' - '.$response->get_error_message());
+            } else {
+                sfAddLog('ERROR', 'Autentication fail! Error: ' . $http_code.' - '.$response['body']);
+            }
             return null;
         }
     } catch (\Exception $e) {
@@ -152,7 +156,7 @@ function sfSendData($data)
             sfAddLog('SUCCESS', 'Sending data done!');
             return true;
         } else {
-            sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code);
+            sfAddLog('ERROR', 'Error sending data! Error code: ' . $http_code. ' - Error message: '.$response);
             return false;
         }
     } catch (\Exception $e) {

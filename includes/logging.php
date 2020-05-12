@@ -2,7 +2,7 @@
 
 function sfAddLog($type, $message)
 {
-    if (!get_option('cf7tosfmc_last_logs')) {
+    if (!is_array(get_option('cf7tosfmc_last_logs'))) {
         update_option('cf7tosfmc_last_logs', []);
     }
     $actualLog = get_option('cf7tosfmc_last_logs');
