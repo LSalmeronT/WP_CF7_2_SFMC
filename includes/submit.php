@@ -88,12 +88,12 @@ function sfGenerateData()
                 case 3:
                     if ($lineArray[1] == 'string') {
                         $data[$lineArray[0]] = $lineArray[2];
-                    } else if ($lineArray[1] == 'integer') {
-                        $data[$lineArray[0]] = (int) $lineArray[2];
+                    } else if ($lineArray[1] == 'int') {
+                        $data[$lineArray[0]] = intval($lineArray[2]);
                     } else if ($lineArray[1] == 'float') {
-                        $data[$lineArray[0]] = (float) $lineArray[2];
-                    } else if ($lineArray[1] == 'boolean') {
-                        $data[$lineArray[0]] = (bool) $lineArray[2];
+                        $data[$lineArray[0]] = floatval($lineArray[2]);
+                    } else if ($lineArray[1] == 'bool') {
+                        $data[$lineArray[0]] = boolval($lineArray[2]);
                     } else {
                         if (isset($_POST[$lineArray[1]])) {
                             $data[$lineArray[0]] = $lineArray[2]($_POST[$lineArray[1]]);
