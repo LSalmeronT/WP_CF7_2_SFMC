@@ -5,9 +5,7 @@ add_action('admin_menu', 'cf7_to_sfmc_config_menu');
 
 function cf7_to_sfmc_config_menu()
 {
-
     add_options_page('CF7 to SF Config', 'CF7 to SF', 'manage_options', 'cf7-to-sfmc-options', 'cf7_to_sfmc_config_options');
-
     //call register settings function
     add_action('admin_init', 'register_cf7_to_sfmc_settings');
 }
@@ -72,6 +70,7 @@ function cf7_to_sfmc_config_options()
                     <td><input type="url" name="cf7tosfmc_endpoint" value="<?php echo esc_attr(get_option('cf7tosfmc_endpoint')); ?>" style="width:100%;" required /></td>
                 </tr>
             </table>
+            <?php submit_button(); ?>
 
             <h2>Authentication</h2>
             <p>Data provided by SalesForce.</p>
@@ -105,6 +104,7 @@ function cf7_to_sfmc_config_options()
                 </tr>
 
             </table>
+            <?php submit_button(); ?>
 
             <h2>Form filter and data mapping</h2>
             <p>Configure which forms will be affected and which fields will be sent to SalesForce.</p>
